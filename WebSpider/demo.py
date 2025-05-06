@@ -55,12 +55,12 @@ tools = [
     Tool(
         name="spider_bilibili",
         func=spider_bilibili,
-        description="通过提供url爬取bilibili视频"
+        description="用于爬取 Bilibili 视频。当 URL 中包含 'bilibili.com' 时使用此工具。"
     ),
     Tool(
         name="spider_biqugen",
         func=spider_biqugen,
-        description="通过提供url爬取笔趣阁小说"
+        description="用于爬取笔趣阁小说。当 URL 中包含 'bie5' 时使用此工具。"
     )
 ]
 
@@ -73,14 +73,12 @@ agent = initialize_agent(
 )
 
 if __name__ == "__main__":
-    # # 示例 1: 爬取 Bilibili 视频
-    # bilibili_url = "https://www.bilibili.com/video/BV1GYGtzmEEN"
-    # print("调用 Bilibili 爬取工具:")
-    # result_1 = agent.run(f"请爬取以下 Bilibili 视频: {bilibili_url}")
-    # print(result_1)
- 
+    # 示例 1: 爬取 Bilibili 视频
+    bilibili_url = "https://www.bilibili.com/video/BV1GYGtzmEEN"
+    result_1 = agent.run(f"请爬取以下url: {bilibili_url}")
+    print(result_1)
+
     # 示例 2: 爬取笔趣阁小说
     biqugen_url = "https://www.bie5.cc/html/45771/"
-    print("\n调用笔趣阁爬取工具:")
-    result_2 = agent.run(f"请爬取以下笔趣阁小说: {biqugen_url}")
+    result_2 = agent.run(f"请爬取以下url: {biqugen_url}")
     print(result_2)
