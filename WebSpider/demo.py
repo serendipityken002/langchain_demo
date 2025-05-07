@@ -11,37 +11,6 @@ from langchain.agents import initialize_agent, Tool
 
 llm = ChatOpenAI(base_url="https://api.chatanywhere.tech/v1")
 
-functions = [
-    {
-        'name': 'spider_bilibili',
-        'description': '通过提供url爬取bilibili视频',
-        'parameters': {
-            'type': 'object',
-            'properties': {
-                'url': {
-                    'type': 'string',
-                    'description': 'url链接',
-                },
-            },
-            'required': ['url'],
-        },
-    },
-    {
-        'name': 'spider_biqugen',
-        'description': '通过提供url爬取笔趣阁小说',
-        'parameters': {
-            'type': 'object',
-            'properties': {
-                'url': {
-                    'type': 'string',
-                    'description': 'url链接',
-                },
-            },
-            'required': ['url'],
-        },
-    }
-]
-
 def spider_bilibili(url):
     bilibili_main(url)
     return "bilibili视频爬取完毕"
@@ -65,7 +34,7 @@ tools = [
 ]
 
 # 初始化 Agent
-agent = initialize_agent(
+spider_agent = initialize_agent(
     tools=tools,
     llm=llm,
     agent="zero-shot-react-description",
@@ -73,12 +42,15 @@ agent = initialize_agent(
 )
 
 if __name__ == "__main__":
+    res = spider_agent.run("你好啊，你都会些什么？")
+    print(res)
+
     # 示例 1: 爬取 Bilibili 视频
     bilibili_url = "https://www.bilibili.com/video/BV1GYGtzmEEN"
-    result_1 = agent.run(f"请爬取以下url: {bilibili_url}")
+    result_1 = spider_agent.run(f"请爬取以下url: {bilibili_url}")
     print(result_1)
 
     # 示例 2: 爬取笔趣阁小说
     biqugen_url = "https://www.bie5.cc/html/45771/"
-    result_2 = agent.run(f"请爬取以下url: {biqugen_url}")
+    result_2 = spider_agent.run(f"请爬取以下url: {biqugen_url}")
     print(result_2)

@@ -2,3 +2,6 @@ video
 novel
 *.env
 *.pyc
+.chainlit
+.files
+chainlit.md
