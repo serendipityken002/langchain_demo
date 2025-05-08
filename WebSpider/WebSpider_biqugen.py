@@ -27,7 +27,7 @@ def save(name, title, contents):
     file = f'novel\\{name}\\'
     if not os.path.exists(file):
         os.mkdir(file)
-    with open(file + title + ".txt", 'a', encoding='utf-8') as f:
+    with open(file + title + ".txt", 'w', encoding='utf-8') as f:
         f.write("\n\n" + title + "\n\n")
         print(title + " 已保存")
         f.write(contents)
