@@ -33,17 +33,18 @@ def save(name, title, contents):
         f.write(contents)
         f.close()
 
-def main(html_url, max=10):
+def main(html_url, first=1, len=5):
     html_data = get_response(html_url).text
     name = re.findall('<meta property="og:novel:book_name" content="(.*?)"/>', html_data, re.S)[0]
     url_list = get_list_url(html_url)
+    url_list = url_list[first-1:len+first-1]
+    contents = ""
     for urli in url_list:
-        max -= 1
-        if max < 0:
-            break
         urli = 'https://www.bie5.cc' + urli
-        title, contents = get_content(urli)
-        save(name, title, contents)
+        title, content = get_content(urli)
+        save(name, title, content)
+        contents += content + "\n\n"
+    return contents
 
 if __name__ == "__main__":
     # html_url = "https://www.bie5.cc/html/45845/"
