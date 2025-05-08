@@ -33,7 +33,7 @@ def save(name, title, contents):
         f.write(contents)
         f.close()
 
-def main(html_url, first=1, len=5):
+def main(html_url, first=1, len=3, save=False):
     html_data = get_response(html_url).text
     name = re.findall('<meta property="og:novel:book_name" content="(.*?)"/>', html_data, re.S)[0]
     url_list = get_list_url(html_url)
@@ -42,8 +42,10 @@ def main(html_url, first=1, len=5):
     for urli in url_list:
         urli = 'https://www.bie5.cc' + urli
         title, content = get_content(urli)
-        save(name, title, content)
+        if save:
+            save(name, title, content)
         contents += content + "\n\n"
+    # return "爬取成功"
     return contents
 
 if __name__ == "__main__":
