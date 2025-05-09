@@ -18,8 +18,8 @@ from langchain.retrievers.document_compressors import LLMChainExtractor
 
 
 def spider_bilibili(url):
-    bilibili_main(url)
-    return "bilibili视频爬取完毕"
+    res = bilibili_main(url)
+    return res
 
 def spider_biqugen(url):
     contents = biqugen_main(url, first=15)
