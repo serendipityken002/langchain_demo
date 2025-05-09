@@ -11,7 +11,11 @@ from langchain.agents import initialize_agent, Tool
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 from langchain.text_splitter import TokenTextSplitter
-import re
+from langchain_openai import OpenAIEmbeddings
+from langchain_community.vectorstores import Chroma
+from langchain.retrievers import ContextualCompressionRetriever
+from langchain.retrievers.document_compressors import LLMChainExtractor
+
 
 def spider_bilibili(url):
     bilibili_main(url)
@@ -178,19 +182,53 @@ def summary_novel(url, llm, spider_agent):
     print(f"文件内容长度: {len(content)}")
     return summarize_long_text(content, llm)
 
+def RAG(file_path):
+    with open(file_path, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    # 1 对长文本进行分词切割
+    text_spider = TokenTextSplitter(
+        chunk_size=1500,
+        chunk_overlap=100,
+        encoding_name="gpt2"
+    )
+    docs = text_spider.create_documents([content])
+
+    # 2 将文档存储向量数据库
+    db = Chroma.from_documents(
+        documents=docs,
+        embedding=OpenAIEmbeddings(openai_api_base="https://api.chatanywhere.tech/v1"),
+        persist_directory="./novel/chroma_db"
+    )
+
+    retriver = db.as_retriever(search_kwargs={"k": 2})
+
+    # 3 检索向量数据库
+    compressor = LLMChainExtractor.from_llm(llm=ChatOpenAI(base_url="https://api.chatanywhere.tech/v1"))
+    compression_retriever = ContextualCompressionRetriever(
+        base_compressor=compressor,
+        base_retriever=retriver
+    )
+
+    docs = compression_retriever.invoke("药老让萧炎买哪些东西？")
+    for doc in docs:
+        print(doc.page_content)
+        print("-" * 50)
+
 if __name__ == "__main__":
-    llm = ChatOpenAI(base_url="https://api.chatanywhere.tech/v1")
-    spider_agent = init_spider_agent(llm)
+    # llm = ChatOpenAI(base_url="https://api.chatanywhere.tech/v1")
+    # spider_agent = init_spider_agent(llm)
 
     # res = spider_agent.run("你好啊，你都会些什么？")
     # print(res)
 
     # # 示例 1: 爬取 Bilibili 视频
-    # bilibili_url = "https://www.bilibili.com/video/BV1GYGtzmEEN"
+    # bilibili_url = "https://www.bilibili.com/video/BV1GYGtzmEEN"/88888888888888888889888888888888 
     # result_1 = spider_agent.run(f"请爬取以下url: {bilibili_url}")
     # print(result_1)
 
-    # 示例 2: 爬取笔趣阁小说
-    biqugen_url = "https://www.bie5.cc/html/45771/"
-    res = summary_novel(biqugen_url, llm, spider_agent)
-    print(res)
+    # # 示例 2: 爬取笔趣阁小说
+    # biqugen_url = "https://www.bie5.cc/html/45771/"
+    # res = summary_novel(biqugen_url, llm, spider_agent)
+    # print(res)
+    RAG("./novel/content_1746695216.txt")
