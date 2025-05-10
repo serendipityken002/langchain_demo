@@ -50,5 +50,6 @@ def main(html_url, first=1, len=3, save=False):
 
 if __name__ == "__main__":
     # html_url = "https://www.bie5.cc/html/45845/"
+    # html_url = "https://www.bie5.cc/html/45771/"
     html_url = input("请输入网址：")
     main(html_url)

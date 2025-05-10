@@ -138,7 +138,7 @@ def query_rag_database(query, db_path=None):
         embedding_function=OpenAIEmbeddings(openai_api_base="https://api.chatanywhere.tech/v1")
     )
     
-    retriever = db.as_retriever(search_kwargs={"k": 2})
+    retriever = db.as_retriever(search_kwargs={"k": 5})
     
     # 设置压缩器
     compressor = LLMChainExtractor.from_llm(llm=ChatOpenAI(base_url="https://api.chatanywhere.tech/v1"))
@@ -276,7 +276,7 @@ tools = [
     Tool(
         name="总结文件内容",
         func=summarize_file_content,
-        description="总结文本文件内容。如果不提供文件路径，会尝试使用上次爬取的文件。输入参数为文件路径(可选)。"
+        description="总结文本文件内容。如果不提供文件路径，会尝试使用上次爬取的文件，需要准确思考和分析文件路径是什么。输入参数为文件路径(可选)。"
     ),
     Tool(
         name="创建向量数据库",
@@ -300,8 +300,9 @@ prefix = """你是一个内容分析助手，可以帮助用户爬取网页内�
 suffix = """请始终使用上述工具完成用户请求。在执行操作前，请根据用户输入决定需要使用的工具和执行顺序。
 
 1. 对于包含URL的请求，先分析URL类型，选择合适的爬虫工具
-2. 爬取内容后，可以选择总结内容或创建向量数据库
+2. 爬取内容后，可以选择创建向量数据库
 3. 如果用户想问问题，需要先确保已创建向量数据库
+4. 如果用户请求总结文件内容，先检查是否有上次爬取的文件
 
 按照智能工作流程自动判断下一步操作。
 
@@ -311,6 +312,8 @@ suffix = """请始终使用上述工具完成用户请求。在执行操作前�
 - 处理历史: {history}
 
 请根据用户的问题和当前状态，决定应该执行什么操作。
+记住，你尽量使用工具来解决用户的问题，而不是直接回答。
+当你完成了所有必要的步骤后，必须提供一个以"Final Answer:"开头的最终回答。
 
 对话历史:
 {chat_history}
@@ -338,7 +341,8 @@ agent_executor = AgentExecutor.from_agent_and_tools(
     agent=agent,
     tools=tools,
     verbose=True,
-    memory=memory
+    memory=memory,
+    handle_parsing_errors=True,
 )
 
 # 主函数
